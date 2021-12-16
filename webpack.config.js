@@ -1,17 +1,26 @@
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const path = require("path");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const isProduction = process.env.NODE_ENV == "production";
 
-module.exports = {
-  entry: "./src/App.tsx",
+
+const config = {
+  entry: "./src/index.tsx",
   output: {
-    path: path.resolve(__dirname, 'dist/'),
-    publicPath: '/',
+    path: path.resolve(__dirname, "dist"),
   },
+  devServer: {
+    open: true,
+    host: "localhost",
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: "index.html",
+    }),
+  ],
   module: {
     rules: [
       {
-        test: /\.(ts|tsx)$/,
+        test: /\.(ts|tsx)$/i,
         use: [
           'babel-loader',
           {
@@ -25,11 +34,16 @@ module.exports = {
       },
     ],
   },
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: './src/index.html',
-      filename: 'index.html',
-    }),
-    new ForkTsCheckerWebpackPlugin(),
-  ],
+  resolve: {
+    extensions: [".tsx", ".ts", ".js"],
+  },
+};
+
+module.exports = () => {
+  if (isProduction) {
+    config.mode = "production";
+  } else {
+    config.mode = "development";
+  }
+  return config;
 };
